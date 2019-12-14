@@ -17,11 +17,23 @@ type public struct {
 	client *http.Client
 }
 
-func NewPublic() Public {
-	return public{
-		domain: "https://api.monobank.ua",
-		client: &http.Client{},
+func (p *public) setDomain(domain string) {
+	p.domain = domain
+}
+
+func NewPublic(opts ...Option) Public {
+	p := public{}
+	for _, opt := range opts {
+		opt(&p)
 	}
+
+	if len(p.domain) == 0 {
+		p.domain = "https://api.monobank.ua"
+	}
+
+	p.client = &http.Client{}
+
+	return p
 }
 
 func (p public) Currency(ctx context.Context) ([]CurrencyInfo, error) {

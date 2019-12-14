@@ -2,15 +2,15 @@ package mono
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 )
 
 type public struct {
-	domain string
-	client HTTPClient
+	domain       string
+	client       HTTPClient
+	unmarshaller Unmarshaller
 }
 
 func (p *public) setClient(client HTTPClient) {
@@ -19,6 +19,10 @@ func (p *public) setClient(client HTTPClient) {
 
 func (p *public) setDomain(domain string) {
 	p.domain = domain
+}
+
+func (p *public) setUnmarshaller(u Unmarshaller) {
+	p.unmarshaller = u
 }
 
 func NewPublic(opts ...Option) Public {
@@ -33,6 +37,10 @@ func NewPublic(opts ...Option) Public {
 
 	if p.client == nil {
 		p.client = &http.Client{}
+	}
+
+	if p.unmarshaller == nil {
+		p.unmarshaller = unmarshaller{}
 	}
 
 	return p
@@ -60,7 +68,7 @@ func (p public) Currency(ctx context.Context) ([]CurrencyInfo, error) {
 
 	if resp.StatusCode != http.StatusOK {
 		var derp ErrorMono
-		if err := json.Unmarshal(bts, &derp); err != nil {
+		if err := p.unmarshaller.Unmarshal(bts, &derp); err != nil {
 			return nil, fmt.Errorf("failed to unmarshal body: %v", err)
 		}
 
@@ -68,7 +76,7 @@ func (p public) Currency(ctx context.Context) ([]CurrencyInfo, error) {
 	}
 
 	var currencies []CurrencyInfo
-	if err := json.Unmarshal(bts, &currencies); err != nil {
+	if err := p.unmarshaller.Unmarshal(bts, &currencies); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal body: %v", err)
 	}
 

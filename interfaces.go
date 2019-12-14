@@ -5,6 +5,10 @@ import (
 	"net/http"
 )
 
+type Unmarshaller interface {
+	Unmarshal(bts []byte, v interface{}) error
+}
+
 type HTTPClient interface {
 	Do(req *http.Request) (*http.Response, error)
 }

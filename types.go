@@ -55,7 +55,7 @@ type StatementItem struct {
 	// Amount in transaction currency in the minimal units -- cents of the corresponding currency.
 	OperationAmount     int64 `json:"operationAmount"`
 	CurrencyCodeISO4217 int   `json:"currencyCode"`
-	// Comission rate in transaction's currency in the minimal units -- cents of the corresponding currency.
+	// Commission rate in transaction's currency in the minimal units -- cents of the corresponding currency.
 	CommissionRate int64 `json:"commissionRate"`
 	// Cashback amount in account currency in the minimal units -- cents of the corresponding currency.
 	CashbackAmount int64 `json:"cashbackAmount"`

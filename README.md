@@ -3,6 +3,7 @@
 [![GoDoc](https://godoc.org/github.com/kudrykv/go-monobank-api?status.svg)](https://godoc.org/github.com/kudrykv/go-monobank-api)
 [![CI](https://github.com/kudrykv/go-monobank-api/workflows/CI/badge.svg)](https://github.com/kudrykv/go-monobank-api/actions?query=workflow%3ACI)
 [![Go Report Card](https://goreportcard.com/badge/github.com/kudrykv/go-monobank-api)](https://goreportcard.com/report/github.com/kudrykv/go-monobank-api)
+[![codecov](https://codecov.io/gh/kudrykv/go-monobank-api/branch/master/graph/badge.svg)](https://codecov.io/gh/kudrykv/go-monobank-api)
 
 ## Usage
 

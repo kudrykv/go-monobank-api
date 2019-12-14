@@ -39,3 +39,11 @@ func (b badReadCloser) Read(p []byte) (n int, err error) {
 func (b badReadCloser) Close() error {
 	return errors.New("boo")
 }
+
+type unmarshaller struct {
+	Err error
+}
+
+func (b *unmarshaller) Unmarshal(bts []byte, v interface{}) error {
+	return b.Err
+}

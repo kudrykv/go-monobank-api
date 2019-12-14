@@ -159,6 +159,33 @@ func TestPublic_Currency_FailBodyClose(t *testing.T) {
 	testCurrencyRequest(t, client.Req)
 }
 
+func TestPublic_Currency_FailUnmarshalOnOK(t *testing.T) {
+	client := &currencyClient{}
+	client.Resp = &http.Response{
+		StatusCode: http.StatusOK,
+		Body:       ioutil.NopCloser(bytes.NewReader([]byte(currencyResponseBody))),
+	}
+
+	ush := &unmarshaller{}
+	ush.Err = errors.New("boo")
+
+	ctx := context.Background()
+
+	public := mono.
+		NewPublic(mono.WithDomain("https://domain"), mono.WithClient(client), mono.WithUnmarshaller(ush))
+
+	_, err := public.Currency(ctx)
+	if err == nil {
+		t.Fatal("No error expected, got nil")
+	}
+
+	if strings.Index(err.Error(), "failed to unmarshal body: ") != 0 {
+		t.Error("Actual error differs from expected. Actual> " + err.Error())
+	}
+
+	testCurrencyRequest(t, client.Req)
+}
+
 func testCurrencyRequest(t *testing.T, req *http.Request) {
 	if req.URL.Scheme != "https" {
 		t.Error("Actual scheme differs from expected. Actual: " + req.URL.Scheme)

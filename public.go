@@ -58,6 +58,15 @@ func (p public) Currency(ctx context.Context) ([]CurrencyInfo, error) {
 		return nil, fmt.Errorf("failed to close the body: %v", err)
 	}
 
+	if resp.StatusCode != http.StatusOK {
+		var derp ErrorMono
+		if err := json.Unmarshal(bts, &derp); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal body: %v", err)
+		}
+
+		return nil, fmt.Errorf("mono error: %s", derp.Description)
+	}
+
 	var currencies []CurrencyInfo
 	if err := json.Unmarshal(bts, &currencies); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal body: %v", err)

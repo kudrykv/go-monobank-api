@@ -2,6 +2,7 @@ package mono_test
 
 import (
 	"errors"
+	"io"
 	"net/http"
 )
 
@@ -25,5 +26,16 @@ func (b badReader) Read(p []byte) (n int, err error) {
 }
 
 func (b badReader) Close() error {
+	return errors.New("boo")
+}
+
+type badReadCloser struct {
+}
+
+func (b badReadCloser) Read(p []byte) (n int, err error) {
+	return 0, io.EOF
+}
+
+func (b badReadCloser) Close() error {
 	return errors.New("boo")
 }

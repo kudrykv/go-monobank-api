@@ -6,3 +6,15 @@ type optioner interface {
 }
 
 type Option func(optioner)
+
+func WithDomain(domain string) Option {
+	return func(o optioner) {
+		o.setDomain(domain)
+	}
+}
+
+func WithClient(client HTTPClient) Option {
+	return func(o optioner) {
+		o.setClient(client)
+	}
+}

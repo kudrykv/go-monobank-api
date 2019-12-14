@@ -85,6 +85,23 @@ func TestPublic_Currency_FailDoRequest(t *testing.T) {
 	testCurrencyRequest(t, client.request())
 }
 
+func TestPublic_Currency_FailReadAll(t *testing.T) {
+	client := &badBodyCurrencyClient{}
+	ctx := context.Background()
+
+	public := mono.NewPublic(mono.WithDomain("https://domain"), mono.WithClient(client))
+	_, err := public.Currency(ctx)
+	if err == nil {
+		t.Fatal("No error expected, got nil")
+	}
+
+	if strings.Index(err.Error(), "failed to read body: ") != 0 {
+		t.Error("Actual error differs from expected. Actual> " + err.Error())
+	}
+
+	testCurrencyRequest(t, client.request())
+}
+
 func testCurrencyRequest(t *testing.T, req *http.Request) {
 	if req.URL.Scheme != "https" {
 		t.Error("Actual scheme differs from expected. Actual: " + req.URL.Scheme)

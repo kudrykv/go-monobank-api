@@ -1,5 +1,7 @@
 # Bindings for Monobank API
 
+![](https://github.com/kudrykv/go-monobank-api/workflows/CI/badge.svg)
+
 ## Usage
 
 ```go
@@ -29,3 +31,6 @@ func main() {
   fmt.Println(currencies)
 }
 ```
+
+## Official API
+https://api.monobank.ua/docs/

@@ -4,12 +4,13 @@ import (
 	"context"
 	"net/http"
 	"reflect"
+	"strings"
 	"testing"
 
 	mono "github.com/kudrykv/go-monobank-api"
 )
 
-func TestPublic_Currency(t *testing.T) {
+func TestPublic_Currency_Succ(t *testing.T) {
 	client := &succCurrencyClient{}
 	ctx := context.Background()
 
@@ -29,23 +30,55 @@ func TestPublic_Currency(t *testing.T) {
 	}}
 
 	if !reflect.DeepEqual(actual, expected) {
-		t.Fatalf("Actual != expected")
+		t.Error("Actual != expected")
 	}
 
 	testCurrencyRequest(t, client.request())
 }
 
-func TestPublic_CurrencyMonoFail(t *testing.T) {
+func TestPublic_Currency_FailMono(t *testing.T) {
 	client := &failCurrencyClient{}
 	ctx := context.Background()
 
 	public := mono.NewPublic(mono.WithDomain("https://domain"), mono.WithClient(client))
 	_, err := public.Currency(ctx)
 	if err == nil {
-		t.Error("No error expected, got nil")
+		t.Fatal("No error expected, got nil")
 	}
 
 	if err.Error() != "mono error: go away" {
+		t.Error("Actual error differs from expected. Actual> " + err.Error())
+	}
+
+	testCurrencyRequest(t, client.request())
+}
+
+func TestPublic_Currency_FailMalformedRequest(t *testing.T) {
+	client := &failCurrencyClient{}
+	ctx := context.Background()
+
+	public := mono.NewPublic(mono.WithDomain("https://domain:invalid"), mono.WithClient(client))
+	_, err := public.Currency(ctx)
+	if err == nil {
+		t.Fatal("No error expected, got nil")
+	}
+
+	if strings.Index(err.Error(), "failed to create request: ") != 0 {
+		t.Error("Actual error differs from expected. Actual> " + err.Error())
+	}
+}
+
+func TestPublic_Currency_FailDoRequest(t *testing.T) {
+	client := &doFailCurrencyClient{}
+	ctx := context.Background()
+
+	public := mono.NewPublic(mono.WithDomain("https://domain"), mono.WithClient(client))
+	_, err := public.Currency(ctx)
+	if err == nil {
+		t.Fatal("No error expected, got nil")
+	}
+
+	if strings.Index(err.Error(), "failed to make request: ") != 0 {
 		t.Error("Actual error differs from expected. Actual> " + err.Error())
 	}
 

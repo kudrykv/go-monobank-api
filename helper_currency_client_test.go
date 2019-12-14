@@ -2,6 +2,7 @@ package mono_test
 
 import (
 	"bytes"
+	"errors"
 	"io/ioutil"
 	"net/http"
 )
@@ -49,6 +50,16 @@ func (f *failCurrencyClient) Do(req *http.Request) (*http.Response, error) {
 		StatusCode: http.StatusBadRequest,
 		Body:       ioutil.NopCloser(bytes.NewReader([]byte(body))),
 	}, nil
+}
+
+type doFailCurrencyClient struct {
+	basicClient
+}
+
+func (d *doFailCurrencyClient) Do(req *http.Request) (*http.Response, error) {
+	d.req = req
+
+	return nil, errors.New("boo")
 }
 
 type basicClient struct {

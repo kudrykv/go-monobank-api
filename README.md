@@ -34,5 +34,5 @@ func main() {
 }
 ```
 
-## Official API
+## Monobank API Documentation
 https://api.monobank.ua/docs/

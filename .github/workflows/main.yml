@@ -19,10 +19,10 @@ jobs:
         run: go mod download
 
       - name: Get linter
-        run: curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b /usr/local/bin v1.21.0
+        run: curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.21.0
 
       - name: Lint
-        run: golangci-lint run
+        run: PATH=$(go env GOPATH)/bin:$PATH golangci-lint run
 
       - name: Test all
         run: go test -v ./...

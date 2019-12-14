@@ -1,6 +1,7 @@
 # Bindings for Monobank API
 
 ![](https://github.com/kudrykv/go-monobank-api/workflows/CI/badge.svg)
+![](https://goreportcard.com/badge/github.com/kudrykv/go-monobank-api)
 
 ## Usage
 

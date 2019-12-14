@@ -14,7 +14,11 @@ type Public interface {
 
 type public struct {
 	domain string
-	client *http.Client
+	client HTTPClient
+}
+
+func (p *public) setClient(client HTTPClient) {
+	p.client = client
 }
 
 func (p *public) setDomain(domain string) {
@@ -31,7 +35,9 @@ func NewPublic(opts ...Option) Public {
 		p.domain = "https://api.monobank.ua"
 	}
 
-	p.client = &http.Client{}
+	if p.client == nil {
+		p.client = &http.Client{}
+	}
 
 	return p
 }

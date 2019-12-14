@@ -1,7 +1,8 @@
 package mono
 
 type optioner interface {
-	setDomain(domain string)
+	setDomain(string)
+	setClient(HTTPClient)
 }
 
 type Option func(optioner)

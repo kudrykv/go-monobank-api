@@ -8,10 +8,6 @@ import (
 	"net/http"
 )
 
-type Public interface {
-	Currency(ctx context.Context) ([]CurrencyInfo, error)
-}
-
 type public struct {
 	domain string
 	client HTTPClient

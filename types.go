@@ -1,10 +1,14 @@
 package mono
 
+// Cashback is the enum of allowed cashback types.
 type Cashback string
 
 const (
-	CashbackNone  Cashback = "None"
-	CashbackUAH   Cashback = "UAH"
+	// CashbackNone tells there is no cashback.
+	CashbackNone Cashback = "None"
+	// CashbackUAH tells the cashback is in UAH.
+	CashbackUAH Cashback = "UAH"
+	// CashbackMiles tells the cashback is in Miles.
 	CashbackMiles Cashback = "Miles"
 )
 
@@ -18,6 +22,7 @@ type UserInfo struct {
 	Accounts []Account `json:"accounts"`
 }
 
+// Account describes customer's account.
 type Account struct {
 	// Identifier of the account.
 	ID string `json:"id"`
@@ -58,6 +63,7 @@ type StatementItem struct {
 	Balance int64 `json:"balance"`
 }
 
+// CurrencyInfo specifies single currency rate.
 type CurrencyInfo struct {
 	CurrencyCodeAISO4217 int `json:"currencyCodeA"`
 	CurrencyCodeBISO4217 int `json:"currencyCodeB"`

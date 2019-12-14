@@ -1,7 +1,10 @@
 package mono_test
 
 import (
+	"bytes"
 	"context"
+	"errors"
+	"io/ioutil"
 	"net/http"
 	"reflect"
 	"strings"
@@ -10,8 +13,37 @@ import (
 	mono "github.com/kudrykv/go-monobank-api"
 )
 
+var currencyResponseBody = `[
+  {
+    "currencyCodeA": 840,
+    "currencyCodeB": 980,
+    "date": 1552392228,
+    "rateSell": 27,
+    "rateBuy": 27.2,
+    "rateCross": 27.1
+  }
+]`
+
+var currencyFailResponseBody = `{
+  "errorDescription": "go away"
+}`
+
+var expectedCurrencyResponseBody = []mono.CurrencyInfo{{
+	CurrencyCodeA: 840,
+	CurrencyCodeB: 980,
+	Date:          1552392228,
+	RateSell:      27,
+	RateBuy:       27.2,
+	RateCross:     27.1,
+}}
+
 func TestPublic_Currency_Succ(t *testing.T) {
-	client := &succCurrencyClient{}
+	client := &currencyClient{}
+	client.Resp = &http.Response{
+		StatusCode: http.StatusOK,
+		Body:       ioutil.NopCloser(bytes.NewReader([]byte(currencyResponseBody))),
+	}
+
 	ctx := context.Background()
 
 	public := mono.NewPublic(mono.WithDomain("https://domain"), mono.WithClient(client))
@@ -20,24 +52,20 @@ func TestPublic_Currency_Succ(t *testing.T) {
 		t.Fatalf("No error expected, got: %v", err)
 	}
 
-	expected := []mono.CurrencyInfo{{
-		CurrencyCodeA: 840,
-		CurrencyCodeB: 980,
-		Date:          1552392228,
-		RateSell:      27,
-		RateBuy:       27.2,
-		RateCross:     27.1,
-	}}
-
-	if !reflect.DeepEqual(actual, expected) {
+	if !reflect.DeepEqual(actual, expectedCurrencyResponseBody) {
 		t.Error("Actual != expected")
 	}
 
-	testCurrencyRequest(t, client.request())
+	testCurrencyRequest(t, client.Req)
 }
 
 func TestPublic_Currency_FailMono(t *testing.T) {
-	client := &failCurrencyClient{}
+	client := &currencyClient{}
+	client.Resp = &http.Response{
+		StatusCode: http.StatusBadRequest,
+		Body:       ioutil.NopCloser(bytes.NewReader([]byte(currencyFailResponseBody))),
+	}
+
 	ctx := context.Background()
 
 	public := mono.NewPublic(mono.WithDomain("https://domain"), mono.WithClient(client))
@@ -50,11 +78,11 @@ func TestPublic_Currency_FailMono(t *testing.T) {
 		t.Error("Actual error differs from expected. Actual> " + err.Error())
 	}
 
-	testCurrencyRequest(t, client.request())
+	testCurrencyRequest(t, client.Req)
 }
 
 func TestPublic_Currency_FailMalformedRequest(t *testing.T) {
-	client := &failCurrencyClient{}
+	client := &currencyClient{}
 	ctx := context.Background()
 
 	public := mono.NewPublic(mono.WithDomain("https://domain:invalid"), mono.WithClient(client))
@@ -69,7 +97,9 @@ func TestPublic_Currency_FailMalformedRequest(t *testing.T) {
 }
 
 func TestPublic_Currency_FailDoRequest(t *testing.T) {
-	client := &doFailCurrencyClient{}
+	client := &currencyClient{}
+	client.Err = errors.New("boo")
+
 	ctx := context.Background()
 
 	public := mono.NewPublic(mono.WithDomain("https://domain"), mono.WithClient(client))
@@ -82,11 +112,16 @@ func TestPublic_Currency_FailDoRequest(t *testing.T) {
 		t.Error("Actual error differs from expected. Actual> " + err.Error())
 	}
 
-	testCurrencyRequest(t, client.request())
+	testCurrencyRequest(t, client.Req)
 }
 
 func TestPublic_Currency_FailReadAll(t *testing.T) {
-	client := &badBodyCurrencyClient{}
+	client := &currencyClient{}
+	client.Resp = &http.Response{
+		StatusCode: http.StatusOK,
+		Body:       &badReader{},
+	}
+
 	ctx := context.Background()
 
 	public := mono.NewPublic(mono.WithDomain("https://domain"), mono.WithClient(client))
@@ -99,7 +134,7 @@ func TestPublic_Currency_FailReadAll(t *testing.T) {
 		t.Error("Actual error differs from expected. Actual> " + err.Error())
 	}
 
-	testCurrencyRequest(t, client.request())
+	testCurrencyRequest(t, client.Req)
 }
 
 func testCurrencyRequest(t *testing.T, req *http.Request) {

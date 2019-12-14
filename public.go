@@ -54,8 +54,6 @@ func NewPublic(opts ...Option) Public {
 	return p
 }
 
-// Currency get basic list of currency.
-// The bank refreshes this list once in a five minutes or less.
 func (p public) Currency(ctx context.Context) ([]CurrencyInfo, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, p.domain+"/bank/currency", nil)
 	if err != nil {

@@ -2,6 +2,7 @@ package mono_test
 
 import (
 	"context"
+	"net/http"
 	"reflect"
 	"testing"
 
@@ -31,8 +32,27 @@ func TestPublic_Currency(t *testing.T) {
 		t.Fatalf("Actual != expected")
 	}
 
-	req := client.request()
+	testCurrencyRequest(t, client.request())
+}
 
+func TestPublic_CurrencyMonoFail(t *testing.T) {
+	client := &failCurrencyClient{}
+	ctx := context.Background()
+
+	public := mono.NewPublic(mono.WithDomain("https://domain"), mono.WithClient(client))
+	_, err := public.Currency(ctx)
+	if err == nil {
+		t.Error("No error expected, got nil")
+	}
+
+	if err.Error() != "mono error: go away" {
+		t.Error("Actual error differs from expected. Actual> " + err.Error())
+	}
+
+	testCurrencyRequest(t, client.request())
+}
+
+func testCurrencyRequest(t *testing.T, req *http.Request) {
 	if req.URL.Scheme != "https" {
 		t.Error("Actual scheme differs from expected. Actual: " + req.URL.Scheme)
 	}

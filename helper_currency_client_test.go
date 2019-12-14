@@ -7,7 +7,7 @@ import (
 )
 
 type succCurrencyClient struct {
-	req *http.Request
+	basicClient
 }
 
 func (c *succCurrencyClient) Do(req *http.Request) (*http.Response, error) {
@@ -31,5 +31,30 @@ func (c *succCurrencyClient) Do(req *http.Request) (*http.Response, error) {
 }
 
 func (c *succCurrencyClient) request() *http.Request {
+	return c.req
+}
+
+type failCurrencyClient struct {
+	basicClient
+}
+
+func (f *failCurrencyClient) Do(req *http.Request) (*http.Response, error) {
+	f.req = req
+
+	body := `{
+  "errorDescription": "go away"
+}`
+
+	return &http.Response{
+		StatusCode: http.StatusBadRequest,
+		Body:       ioutil.NopCloser(bytes.NewReader([]byte(body))),
+	}, nil
+}
+
+type basicClient struct {
+	req *http.Request
+}
+
+func (c *basicClient) request() *http.Request {
 	return c.req
 }

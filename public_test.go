@@ -37,6 +37,33 @@ var expectedCurrencyResponseBody = []mono.CurrencyInfo{{
 	RateCross:     27.1,
 }}
 
+func TestNewPublic_Domain(t *testing.T) {
+	client := &currencyClient{}
+	client.Resp = &http.Response{
+		StatusCode: http.StatusOK,
+		Body:       ioutil.NopCloser(bytes.NewReader([]byte(currencyResponseBody))),
+	}
+
+	public := mono.NewPublic(mono.WithClient(client))
+
+	actual, err := public.Currency(context.Background())
+	if err != nil {
+		t.Fatalf("No error expected, got: %v", err)
+	}
+
+	if !reflect.DeepEqual(actual, expectedCurrencyResponseBody) {
+		t.Error("Actual != expected")
+	}
+
+	if client.Req.URL.Scheme != "https" {
+		t.Error("Actual domain differs from expected. Actual: " + client.Req.URL.Scheme)
+	}
+
+	if client.Req.URL.Host != "api.monobank.ua" {
+		t.Error("Actual domain differs from expected. Actual: " + client.Req.URL.Host)
+	}
+}
+
 func TestPublic_Currency_Succ(t *testing.T) {
 	client := &currencyClient{}
 	client.Resp = &http.Response{
@@ -71,7 +98,7 @@ func TestPublic_Currency_FailMono(t *testing.T) {
 	public := mono.NewPublic(mono.WithDomain("https://domain"), mono.WithClient(client))
 	_, err := public.Currency(ctx)
 	if err == nil {
-		t.Fatal("No error expected, got nil")
+		t.Fatal("Error expected, got nil")
 	}
 
 	if err.Error() != "mono error: go away" {
@@ -88,7 +115,7 @@ func TestPublic_Currency_FailMalformedRequest(t *testing.T) {
 	public := mono.NewPublic(mono.WithDomain("https://domain:invalid"), mono.WithClient(client))
 	_, err := public.Currency(ctx)
 	if err == nil {
-		t.Fatal("No error expected, got nil")
+		t.Fatal("Error expected, got nil")
 	}
 
 	if strings.Index(err.Error(), "failed to create request: ") != 0 {
@@ -105,7 +132,7 @@ func TestPublic_Currency_FailDoRequest(t *testing.T) {
 	public := mono.NewPublic(mono.WithDomain("https://domain"), mono.WithClient(client))
 	_, err := public.Currency(ctx)
 	if err == nil {
-		t.Fatal("No error expected, got nil")
+		t.Fatal("Error expected, got nil")
 	}
 
 	if strings.Index(err.Error(), "failed to make request: ") != 0 {
@@ -127,7 +154,7 @@ func TestPublic_Currency_FailReadAll(t *testing.T) {
 	public := mono.NewPublic(mono.WithDomain("https://domain"), mono.WithClient(client))
 	_, err := public.Currency(ctx)
 	if err == nil {
-		t.Fatal("No error expected, got nil")
+		t.Fatal("Error expected, got nil")
 	}
 
 	if strings.Index(err.Error(), "failed to read body: ") != 0 {
@@ -149,7 +176,7 @@ func TestPublic_Currency_FailBodyClose(t *testing.T) {
 	public := mono.NewPublic(mono.WithDomain("https://domain"), mono.WithClient(client))
 	_, err := public.Currency(ctx)
 	if err == nil {
-		t.Fatal("No error expected, got nil")
+		t.Fatal("Error expected, got nil")
 	}
 
 	if strings.Index(err.Error(), "failed to close the body: ") != 0 {
@@ -176,7 +203,7 @@ func TestPublic_Currency_FailUnmarshalOnOK(t *testing.T) {
 
 	_, err := public.Currency(ctx)
 	if err == nil {
-		t.Fatal("No error expected, got nil")
+		t.Fatal("Error expected, got nil")
 	}
 
 	if strings.Index(err.Error(), "failed to unmarshal body: ") != 0 {
@@ -203,7 +230,7 @@ func TestPublic_Currency_FailUnmarshalOnBadRequest(t *testing.T) {
 
 	_, err := public.Currency(ctx)
 	if err == nil {
-		t.Fatal("No error expected, got nil")
+		t.Fatal("Error expected, got nil")
 	}
 
 	if strings.Index(err.Error(), "failed to unmarshal body: ") != 0 {

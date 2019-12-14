@@ -25,6 +25,14 @@ func (p *public) setUnmarshaller(u Unmarshaller) {
 	p.unmarshaller = u
 }
 
+// NewPublic creates the client to interact with the public API.
+//
+// Factory supports parametrize http client, domain, and unmarshaller.
+//  mono.NewPublic(
+//    mono.WithDomain("https://custom-domain"),
+//    mono.WithClient(&http.Client{}),
+//    mono.WithUnmarshaller(&smthImplementingUnmarshaller),
+//  )
 func NewPublic(opts ...Option) Public {
 	p := public{}
 	for _, opt := range opts {
@@ -67,7 +75,7 @@ func (p public) Currency(ctx context.Context) ([]CurrencyInfo, error) {
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		var derp ErrorMono
+		var derp errorMono
 		if err := p.unmarshaller.Unmarshal(bts, &derp); err != nil {
 			return nil, fmt.Errorf("failed to unmarshal body: %v", err)
 		}

@@ -29,12 +29,12 @@ var currencyFailResponseBody = `{
 }`
 
 var expectedCurrencyResponseBody = []mono.CurrencyInfo{{
-	CurrencyCodeA: 840,
-	CurrencyCodeB: 980,
-	Date:          1552392228,
-	RateSell:      27,
-	RateBuy:       27.2,
-	RateCross:     27.1,
+	CurrencyCodeAISO4217: 840,
+	CurrencyCodeBISO4217: 980,
+	Date:                 1552392228,
+	RateSell:             27,
+	RateBuy:              27.2,
+	RateCross:            27.1,
 }}
 
 func TestNewPublic_Domain(t *testing.T) {

@@ -1,5 +1,9 @@
 # Bindings for Monobank API
 
+[![GoDoc](https://godoc.org/github.com/kudrykv/go-monobank-api?status.svg)](https://godoc.org/github.com/kudrykv/go-monobank-api)
+![](https://github.com/kudrykv/go-monobank-api/workflows/CI/badge.svg)
+![](https://goreportcard.com/badge/github.com/kudrykv/go-monobank-api)
+
 ## Usage
 
 ```go
@@ -29,3 +33,6 @@ func main() {
   fmt.Println(currencies)
 }
 ```
+
+## Monobank API Documentation
+https://api.monobank.ua/docs/

@@ -1,51 +1,79 @@
 package mono
 
+// Cashback is the enum of allowed cashback types.
 type Cashback string
 
 const (
-	CashbackNone  Cashback = "None"
-	CashbackUAH   Cashback = "UAH"
+	// CashbackNone tells there is no cashback.
+	CashbackNone Cashback = "None"
+	// CashbackUAH tells the cashback is in UAH.
+	CashbackUAH Cashback = "UAH"
+	// CashbackMiles tells the cashback is in Miles.
 	CashbackMiles Cashback = "Miles"
 )
 
+// UserInfo describes customer and customer's accounts.
 type UserInfo struct {
-	Name       string    `json:"name"`
-	WebHookURL string    `json:"webHookUrl"`
-	Accounts   []Account `json:"accounts"`
+	// Name describes client name.
+	Name string `json:"name"`
+	// WebHookURL for getting information about the new transaction.
+	WebHookURL string `json:"webHookUrl"`
+	// Accounts list available accounts.
+	Accounts []Account `json:"accounts"`
 }
 
+// Account describes customer's account.
 type Account struct {
-	ID           string   `json:"id"`
-	Balance      int64    `json:"balance"`
-	CreditLimit  int64    `json:"creditLimit"`
-	CurrencyCode int      `json:"currencyCode"`
+	// Identifier of the account.
+	ID string `json:"id"`
+	// Balance in the minimal units -- cents of the corresponding currency.
+	Balance int64 `json:"balance"`
+	// Credit limit.
+	CreditLimit int64 `json:"creditLimit"`
+	// Currency code in ISO 4217.
+	CurrencyCodeISO4217 int `json:"currencyCode"`
+	// Type of the cashback.
+	// Available values are `None`, `UAH`, and `Miles`.
+	// One can refer using package's consts.
 	CashbackType Cashback `json:"cashbackType"`
 }
 
+// StatementItem is the transaction entry.
 type StatementItem struct {
-	ID          string `json:"id"`
+	// Transaction identifier.
+	ID string `json:"id"`
+	// Time when the transaction was made in UNIX timestamp.
 	Time        int64  `json:"time"`
 	Description string `json:"description"`
 	// Merchant Category Code
-	MCC             int   `json:"mcc"`
-	Hold            bool  `json:"hold"`
-	Amount          int64 `json:"amount"`
-	OperationAmount int64 `json:"operationAmount"`
-	CurrencyCode    int   `json:"currencyCode"`
-	CommissionRate  int64 `json:"commissionRate"`
-	CashbackAmount  int64 `json:"cashbackAmount"`
-	Balance         int64 `json:"balance"`
+	MCC int `json:"mcc"`
+	// Hold state.
+	// Learn more: https://en.wikipedia.org/wiki/Authorization_hold
+	Hold bool `json:"hold"`
+	// Amount in account currency in the minimal units -- cents of the corresponding currency.
+	Amount int64 `json:"amount"`
+	// Amount in transaction currency in the minimal units -- cents of the corresponding currency.
+	OperationAmount     int64 `json:"operationAmount"`
+	CurrencyCodeISO4217 int   `json:"currencyCode"`
+	// Comission rate in transaction's currency in the minimal units -- cents of the corresponding currency.
+	CommissionRate int64 `json:"commissionRate"`
+	// Cashback amount in account currency in the minimal units -- cents of the corresponding currency.
+	CashbackAmount int64 `json:"cashbackAmount"`
+	// Balance in the minimal units -- cents of the corresponding currency.
+	Balance int64 `json:"balance"`
 }
 
+// CurrencyInfo specifies single currency rate.
 type CurrencyInfo struct {
-	CurrencyCodeA int     `json:"currencyCodeA"`
-	CurrencyCodeB int     `json:"currencyCodeB"`
-	Date          int64   `json:"date"`
-	RateSell      float64 `json:"rateSell"`
-	RateBuy       float64 `json:"rateBuy"`
-	RateCross     float64 `json:"rateCross"`
+	CurrencyCodeAISO4217 int `json:"currencyCodeA"`
+	CurrencyCodeBISO4217 int `json:"currencyCodeB"`
+	// Rate at the given point of time in UNIX timestamp.
+	Date      int64   `json:"date"`
+	RateSell  float64 `json:"rateSell"`
+	RateBuy   float64 `json:"rateBuy"`
+	RateCross float64 `json:"rateCross"`
 }
 
-type ErrorMono struct {
+type errorMono struct {
 	Description string `json:"errorDescription"`
 }

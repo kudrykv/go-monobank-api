@@ -25,4 +25,7 @@ jobs:
         run: PATH=$(go env GOPATH)/bin:$PATH golangci-lint run
 
       - name: Test all
-        run: go test -v ./...
+        run: go test -race -coverprofile=coverage.txt -covermode=atomic
+
+      - name: Upload coverage
+        run: bash <(curl -s https://codecov.io/bash)

@@ -1,4 +1,4 @@
-package mono_test
+package mono
 
 import (
 	"errors"
@@ -6,13 +6,13 @@ import (
 	"net/http"
 )
 
-type currencyClient struct {
+type httpclienttest struct {
 	Req  *http.Request
 	Resp *http.Response
 	Err  error
 }
 
-func (c *currencyClient) Do(req *http.Request) (*http.Response, error) {
+func (c *httpclienttest) Do(req *http.Request) (*http.Response, error) {
 	c.Req = req
 
 	return c.Resp, c.Err
@@ -21,18 +21,18 @@ func (c *currencyClient) Do(req *http.Request) (*http.Response, error) {
 type badReader struct {
 }
 
-func (b badReader) Read(p []byte) (n int, err error) {
+func (b badReader) Read([]byte) (int, error) {
 	return 0, errors.New("boo")
 }
 
 func (b badReader) Close() error {
-	return errors.New("boo")
+	panic("reading failed already")
 }
 
 type badReadCloser struct {
 }
 
-func (b badReadCloser) Read(p []byte) (n int, err error) {
+func (b badReadCloser) Read([]byte) (int, error) {
 	return 0, io.EOF
 }
 
@@ -40,10 +40,10 @@ func (b badReadCloser) Close() error {
 	return errors.New("boo")
 }
 
-type unmarshaller struct {
+type unmtest struct {
 	Err error
 }
 
-func (b *unmarshaller) Unmarshal(bts []byte, v interface{}) error {
+func (b unmtest) Unmarshal([]byte, interface{}) error {
 	return b.Err
 }

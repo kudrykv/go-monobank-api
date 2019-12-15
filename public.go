@@ -2,15 +2,13 @@ package mono
 
 import (
 	"context"
-	"fmt"
-	"io/ioutil"
 	"net/http"
 )
 
 type public struct {
-	domain       string
-	client       HTTPClient
-	unmarshaller Unmarshaller
+	domain string
+
+	tinyClient
 }
 
 func (p *public) setClient(client HTTPClient) {
@@ -55,37 +53,9 @@ func NewPublic(opts ...Option) Public {
 }
 
 func (p public) Currency(ctx context.Context) ([]CurrencyInfo, error) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, p.domain+"/bank/currency", nil)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create request: %v", err)
-	}
-
-	resp, err := p.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to make request: %v", err)
-	}
-
-	bts, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read body: %v", err)
-	}
-
-	if err := resp.Body.Close(); err != nil {
-		return nil, fmt.Errorf("failed to close the body: %v", err)
-	}
-
-	if resp.StatusCode != http.StatusOK {
-		var derp errorMono
-		if err := p.unmarshaller.Unmarshal(bts, &derp); err != nil {
-			return nil, fmt.Errorf("failed to unmarshal body: %v", err)
-		}
-
-		return nil, fmt.Errorf("mono error: %s", derp.Description)
-	}
-
 	var currencies []CurrencyInfo
-	if err := p.unmarshaller.Unmarshal(bts, &currencies); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal body: %v", err)
+	if err := p.request(ctx, http.MethodGet, p.domain+"/bank/currency", nil, &currencies); err != nil {
+		return nil, err
 	}
 
 	return currencies, nil

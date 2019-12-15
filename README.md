@@ -32,6 +32,16 @@ func main() {
   }
 
   fmt.Println(currencies)
+
+  // NewPersonal can be configured in the same way the public client.
+  private := mono.NewPersonal("api-token")
+
+  info, err := private.ClientInfo(context.Background())
+  if err != nil {
+    panic(err)
+  }
+
+  fmt.Println(info)
 }
 ```
 

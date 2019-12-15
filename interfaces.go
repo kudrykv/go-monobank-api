@@ -22,3 +22,8 @@ type Public interface {
 	// The bank refreshes this list once in a five minutes or less.
 	Currency(ctx context.Context) ([]CurrencyInfo, error)
 }
+
+// Personal is the client for accessing Personal API.
+type Personal interface {
+	ClientInfo(ctx context.Context) (*UserInfo, error)
+}

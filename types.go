@@ -62,12 +62,14 @@ type CurrencyInfo struct {
 	RateCross float64 `json:"rateCross"`
 }
 
+// WebhookData defines the shape of the incoming webhook object.
 type WebhookData struct {
 	Type string `json:"type"`
 
 	Data WebhookStatementItem `json:"data"`
 }
 
+// WebhookStatementItem is the transaction item from the webhook.
 type WebhookStatementItem struct {
 	AccountID     string        `json:"account"`
 	StatementItem StatementItem `json:"statementItem"`

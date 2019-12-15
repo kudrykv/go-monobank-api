@@ -7,9 +7,12 @@
 
 ---
 
-The library is the client to work with Monobank API.
+go-monobank-api is the library to interact with the Monobank API.
+It provides clients for working with public and personal API.
+
 One of its features is no dependencies on 3rd-party libraries.
 
+The library allows to work with webhooks.
 It is possible to either parse the webhook response using the helper method, or receive webhooks in channel.
 
 ## Usage
@@ -27,12 +30,6 @@ import (
 )
 
 func main() {
-  // public can be initialized with optional parameters:
-  //   mono.NewPublic(
-  //     mono.WithDomain("custom-domain"),
-  //     mono.WithClient(&http.Client{}),
-  //     mono.WithUnmarshaller(customUnmarshaller),
-  //   )
   public := mono.NewPublic()
 
   currencies, err := public.Currency(context.Background())
@@ -42,7 +39,6 @@ func main() {
 
   fmt.Println(currencies)
 
-  // NewPersonal can be configured in the same way the public client.
   private := mono.NewPersonal("api-token")
 
   info, err := private.ClientInfo(context.Background())
@@ -127,6 +123,11 @@ func main() {
 }
 
 ```
+
+## Support
+
+Is something missing or works in unexpected way?
+[Create for that an issue](https://github.com/kudrykv/go-monobank-api/issues/new).
 
 ## Monobank API Documentation
 https://api.monobank.ua/docs/

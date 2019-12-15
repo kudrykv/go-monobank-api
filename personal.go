@@ -8,6 +8,9 @@ import (
 	"time"
 )
 
+// MaxAllowedDuration specifies the maximum duration period for getting transactions.
+// The bank defines the value.
+// It equals to 31 days + 1 hour.
 const MaxAllowedDuration = 2682000
 
 type personal struct {

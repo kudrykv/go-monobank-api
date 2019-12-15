@@ -3,9 +3,9 @@ package mono_test
 import (
 	"bytes"
 	"context"
+	"errors"
 	"io/ioutil"
 	"net/http"
-	"reflect"
 	"testing"
 	"time"
 
@@ -40,22 +40,16 @@ var expectedPersonal = mono.UserInfo{
 
 func TestNewPersonal(t *testing.T) {
 	p := mono.NewPersonal("token")
-
-	if p == nil {
-		t.Fatal("personal must not be nil")
-	}
+	expectNotNil(t, p)
 }
 
 func TestNewPersonal_PanicOnEmptyToken(t *testing.T) {
 	defer func() {
-		err := recover()
-		if err == nil {
-			t.Fatal("expected error, but got nil")
-		}
+		err, ok := recover().(string)
 
-		if err != "api token is required" {
-			t.Error("got: " + err.(string))
-		}
+		expectTrue(t, ok)
+		expectNotNil(t, err)
+		expectError(t, errors.New(err), "api token is required")
 	}()
 
 	mono.NewPersonal("")
@@ -72,14 +66,11 @@ func TestPersonal_ClientInfo_Succ(t *testing.T) {
 	apiToken := "api-token"
 
 	personal := mono.NewPersonal(apiToken, mono.WithClient(client))
-	actual, err := personal.ClientInfo(ctx)
-	if err != nil {
-		t.Fatalf("No error expected, got: %v", err)
-	}
 
-	if !reflect.DeepEqual(actual, &expectedPersonal) {
-		t.Error("Actual != expected")
-	}
+	actual, err := personal.ClientInfo(ctx)
+
+	expectNoError(t, err)
+	expectDeepEquals(t, actual, &expectedPersonal)
 }
 
 func TestPersonal_ClientInfo_Fail(t *testing.T) {
@@ -93,14 +84,9 @@ func TestPersonal_ClientInfo_Fail(t *testing.T) {
 	apiToken := "api-token"
 
 	personal := mono.NewPersonal(apiToken, mono.WithClient(client))
-	_, err := personal.ClientInfo(ctx)
-	if err == nil {
-		t.Fatal("Error expected, got nil")
-	}
 
-	if err.Error() != "mono error: go away" {
-		t.Error("Actual error differs from expected. Actual> " + err.Error())
-	}
+	_, err := personal.ClientInfo(ctx)
+	expectError(t, err, "mono error: go away")
 }
 
 var statementsResponseBody = `[
@@ -147,14 +133,10 @@ func TestPersonal_Statements_Succ(t *testing.T) {
 	to := time.Now()
 
 	personal := mono.NewPersonal(apiToken, mono.WithClient(client))
-	statements, err := personal.Statements(ctx, accountID, from, to)
-	if err != nil {
-		t.Fatal("Expected err to be nil, got: " + err.Error())
-	}
 
-	if !reflect.DeepEqual(statements, expectedStatementsResponse) {
-		t.Fatal("actual != expected")
-	}
+	statements, err := personal.Statements(ctx, accountID, from, to)
+	expectNoError(t, err)
+	expectDeepEquals(t, statements, expectedStatementsResponse)
 }
 
 func TestPersonal_Statements_Fail(t *testing.T) {
@@ -185,17 +167,6 @@ func TestPersonal_Statements_Fail(t *testing.T) {
 	expectError(t, err, "mono error: go away")
 }
 
-func expectError(t *testing.T, actual error, expected string) {
-	if actual == nil {
-		t.Error("Expected error to be present, actual nil")
-		return
-	}
-
-	if actual.Error() != expected {
-		t.Error("Actual error is '" + actual.Error() + "', expected '" + expected + "'")
-	}
-}
-
 func TestPersonal_LatestStatements(t *testing.T) {
 	client := &clienttest{}
 	client.Resp = &http.Response{
@@ -209,12 +180,8 @@ func TestPersonal_LatestStatements(t *testing.T) {
 	from := time.Now().Add(-time.Hour * 24 * 15) // 15 days
 
 	personal := mono.NewPersonal(apiToken, mono.WithClient(client))
-	statements, err := personal.LatestStatements(ctx, accountID, from)
-	if err != nil {
-		t.Fatal("Expected err to be nil, got: " + err.Error())
-	}
 
-	if !reflect.DeepEqual(statements, expectedStatementsResponse) {
-		t.Fatal("actual != expected")
-	}
+	statements, err := personal.LatestStatements(ctx, accountID, from)
+	expectNoError(t, err)
+	expectDeepEquals(t, statements, expectedStatementsResponse)
 }

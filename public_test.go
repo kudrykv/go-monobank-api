@@ -22,7 +22,7 @@ var currencyResponseBody = `[
   }
 ]`
 
-var currencyFailResponseBody = `{
+var failResponseBody = `{
   "errorDescription": "go away"
 }`
 
@@ -86,7 +86,7 @@ func TestPublic_Currency_FailMono(t *testing.T) {
 	client := &currencyClient{}
 	client.Resp = &http.Response{
 		StatusCode: http.StatusBadRequest,
-		Body:       ioutil.NopCloser(bytes.NewReader([]byte(currencyFailResponseBody))),
+		Body:       ioutil.NopCloser(bytes.NewReader([]byte(failResponseBody))),
 	}
 
 	ctx := context.Background()

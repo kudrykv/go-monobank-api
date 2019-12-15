@@ -6,6 +6,7 @@ import (
 	"errors"
 	"io/ioutil"
 	"net/http"
+	"net/http/httptest"
 	"testing"
 	"time"
 
@@ -218,4 +219,62 @@ func TestPersonal_SetWebhook_Fail(t *testing.T) {
 
 	err := personal.SetWebhook(ctx, wh)
 	expectError(t, err, "mono error: go away")
+}
+
+var webhookBody = `{
+	"type": "StatementItem",
+	"data": {
+		"account": "deadbeef",
+		"statementItem": {
+			"id": "ZuHWzqkKGVo=",
+			"time": 1554466347,
+			"description": "Покупка щастя",
+			"mcc": 7997,
+			"hold": false,
+			"amount": -95000,
+			"operationAmount": -95000,
+			"currencyCode": 980,
+			"commissionRate": 0,
+			"cashbackAmount": 19000,
+			"balance": 10050000
+		}
+	}
+}`
+
+var webhookParsed = mono.WebhookData{
+	Type: "StatementItem",
+	Data: mono.WebhookStatementItem{
+		AccountID: "deadbeef",
+		StatementItem: mono.StatementItem{
+			ID:                  "ZuHWzqkKGVo=",
+			Time:                1554466347,
+			Description:         "Покупка щастя",
+			MCC:                 7997,
+			Hold:                false,
+			Amount:              -95000,
+			OperationAmount:     -95000,
+			CurrencyCodeISO4217: 980,
+			CommissionRate:      0,
+			CashbackAmount:      19000,
+			Balance:             10050000,
+		},
+	},
+}
+
+func TestPersonal_ParseWebhook_Succ(t *testing.T) {
+	client := &clienttest{}
+	client.Resp = &http.Response{
+		StatusCode: http.StatusOK,
+		Body:       ioutil.NopCloser(bytes.NewReader([]byte(`{"status":"ok"}`))),
+	}
+
+	ctx := context.Background()
+	apiToken := "api-token"
+	req := httptest.NewRequest(http.MethodGet, "/", bytes.NewReader([]byte(webhookBody)))
+
+	personal := mono.NewPersonal(apiToken, mono.WithClient(client))
+
+	actual, err := personal.ParseWebhook(ctx, req)
+	expectNoError(t, err)
+	expectDeepEquals(t, actual, &webhookParsed)
 }

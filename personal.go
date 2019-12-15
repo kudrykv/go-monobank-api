@@ -1,10 +1,12 @@
 package mono
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -65,4 +67,12 @@ func (p personal) Statements(ctx context.Context, account string, from, to time.
 	}
 
 	return statements, nil
+}
+
+func (p personal) SetWebhook(ctx context.Context, webhook string) error {
+	wh := strings.ReplaceAll(strings.ReplaceAll(webhook, `"`, `\"`), "\n", "\\n")
+	body := bytes.NewReader([]byte(`{"webHookUrl":"` + wh + `"}`))
+
+	var empty struct{}
+	return p.request(ctx, http.MethodPost, p.domain+"/personal/webhook", body, &empty)
 }

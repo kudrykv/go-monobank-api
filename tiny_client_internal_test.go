@@ -10,6 +10,8 @@ import (
 	"testing"
 )
 
+const testFailResponseBody = `{"errorDescription":"go away"}`
+
 func TestTinyClientRequest_Succ(t *testing.T) {
 	hct := &httpclienttest{
 		Resp: &http.Response{
@@ -38,7 +40,7 @@ func TestTinyClientRequest_FailMono(t *testing.T) {
 	hct := &httpclienttest{
 		Resp: &http.Response{
 			StatusCode: http.StatusBadRequest,
-			Body:       ioutil.NopCloser(bytes.NewReader([]byte(`{"errorDescription":"go away"}`))),
+			Body:       ioutil.NopCloser(bytes.NewReader([]byte(testFailResponseBody))),
 		},
 		Err: nil,
 	}
@@ -132,6 +134,33 @@ func TestTinyClientRequest_FailBodyClose(t *testing.T) {
 	}
 
 	if strings.Index(err.Error(), "failed to close the body: ") != 0 {
+		t.Error("Actual error differs from expected. Actual> " + err.Error())
+	}
+
+	testRequest(t, hct.Req)
+}
+
+func TestTinyClientRequest_FailUnmarshalOnBadRequest(t *testing.T) {
+	hct := &httpclienttest{
+		Resp: &http.Response{
+			StatusCode: http.StatusBadRequest,
+			Body:       ioutil.NopCloser(bytes.NewReader([]byte(testFailResponseBody))),
+		},
+		Err: nil,
+	}
+
+	u := unmtest{}
+	u.Err = errors.New("boo")
+
+	client := tinyClient{client: hct, unmarshaller: u}
+
+	var ultimateAnswer int
+	err := client.request(context.Background(), http.MethodGet, "https://domain/url", nil, &ultimateAnswer)
+	if err == nil {
+		t.Fatal("Error expected, got nil")
+	}
+
+	if strings.Index(err.Error(), "failed to unmarshal body: ") != 0 {
 		t.Error("Actual error differs from expected. Actual> " + err.Error())
 	}
 

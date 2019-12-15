@@ -299,3 +299,26 @@ func TestPersonal_ParseWebhook_Fail(t *testing.T) {
 	_, err = personal.ParseWebhook(ctx, req)
 	expectErrorStartsWith(t, err, "failed to unmarshal bytes: ")
 }
+
+func TestPersonal_ListenForWebhooks_Succ(t *testing.T) {
+	client := &clienttest{}
+
+	apiToken := "api-token"
+	personal := mono.NewPersonal(apiToken, mono.WithClient(client))
+
+	whChan, handlerFunc := personal.ListenForWebhooks(context.Background())
+
+	w := httptest.NewRecorder()
+	r := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader([]byte(webhookBody)))
+
+	handlerFunc(w, r)
+	expectEquals(t, w.Code, http.StatusOK)
+
+	select {
+	case <-time.After(time.Millisecond * 10):
+		t.Fatalf("died waiting on the message")
+
+	case wh := <-whChan:
+		expectDeepEquals(t, wh, webhookParsed)
+	}
+}

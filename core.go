@@ -3,7 +3,8 @@ package mono
 import "net/http"
 
 type core struct {
-	domain string
+	domain       string
+	whBufferSize uint32
 
 	tinyClient
 }
@@ -20,9 +21,14 @@ func (c *core) setUnmarshaller(u Unmarshaller) {
 	c.unmarshaller = u
 }
 
+func (c *core) setWebhookBufferSize(size uint32) {
+	c.whBufferSize = size
+}
+
 func newCore(opts ...Option) core {
 	c := core{
-		domain: DefaultDomain,
+		domain:       DefaultDomain,
+		whBufferSize: 100,
 		tinyClient: tinyClient{
 			client:       &http.Client{},
 			unmarshaller: unmarshaller{},

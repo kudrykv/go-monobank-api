@@ -1,17 +1,16 @@
 package mono
 
 import (
+	"bytes"
 	"context"
 	"errors"
+	"fmt"
+	"io/ioutil"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 )
-
-// MaxAllowedDuration specifies the maximum duration period for getting transactions.
-// The bank defines the value.
-// It equals to 31 days + 1 hour.
-const MaxAllowedDuration = 2682000
 
 type personal struct {
 	core
@@ -65,4 +64,48 @@ func (p personal) Statements(ctx context.Context, account string, from, to time.
 	}
 
 	return statements, nil
+}
+
+func (p personal) SetWebhook(ctx context.Context, webhook string) error {
+	wh := strings.ReplaceAll(strings.ReplaceAll(webhook, `"`, `\"`), "\n", "\\n")
+	body := bytes.NewReader([]byte(`{"webHookUrl":"` + wh + `"}`))
+
+	var empty struct{}
+	return p.request(ctx, http.MethodPost, p.domain+"/personal/webhook", body, &empty)
+}
+
+func (p personal) ParseWebhook(_ context.Context, r *http.Request) (*WebhookData, error) {
+	bts, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read body: %v", err)
+	}
+
+	if err := r.Body.Close(); err != nil {
+		return nil, fmt.Errorf("failed to close body: %v", err)
+	}
+
+	var wh WebhookData
+	if err := p.unmarshaller.Unmarshal(bts, &wh); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal bytes: %v", err)
+	}
+
+	return &wh, nil
+}
+
+func (p personal) ListenForWebhooks(_ context.Context) (<-chan WebhookData, http.HandlerFunc) {
+	whch := make(chan WebhookData, p.whBufferSize)
+
+	return whch, func(w http.ResponseWriter, r *http.Request) {
+		wh, err := p.ParseWebhook(r.Context(), r)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		go func() {
+			whch <- *wh
+		}()
+
+		w.WriteHeader(http.StatusOK)
+	}
 }

@@ -10,7 +10,11 @@
 The library is the client to work with Monobank API.
 One of its features is no dependencies on 3rd-party libraries.
 
+It is possible to either parse the webhook response using the helper method, or receive webhooks in channel.
+
 ## Usage
+
+### Basic usage
 
 ```go
 package main
@@ -50,6 +54,80 @@ func main() {
 }
 ```
 
+### Webhooks
+
+Example app for using channels:
+```go
+package main
+
+import (
+  "context"
+  "fmt"
+  "net/http"
+
+  mono "github.com/kudrykv/go-monobank-api"
+)
+
+func main() {
+  personal := mono.NewPersonal("api-token")
+  if err := personal.SetWebhook(context.Background(), "https://domain/webhook"); err != nil {
+    panic(err)
+  }
+
+  webhookChan, handlerFunc := personal.ListenForWebhooks(context.Background())
+
+  mux := http.NewServeMux()
+  mux.HandleFunc("/webhook", handlerFunc)
+
+  go func() {
+    wh := <-webhookChan
+
+    fmt.Println(wh)
+  }()
+
+  if err := http.ListenAndServe("", mux); err != nil {
+    panic(err)
+  }
+}
+```
+
+Example app for using helper func:
+```go
+package main
+
+import (
+  "context"
+  "fmt"
+  "net/http"
+
+  mono "github.com/kudrykv/go-monobank-api"
+)
+
+func main() {
+  personal := mono.NewPersonal("api-token")
+  if err := personal.SetWebhook(context.Background(), "https://domain/webhook"); err != nil {
+    panic(err)
+  }
+
+  mux := http.NewServeMux()
+  mux.HandleFunc("/webhook", func(w http.ResponseWriter, r *http.Request) {
+    webhook, err := personal.ParseWebhook(r.Context(), r)
+    if err != nil {
+      w.WriteHeader(http.StatusInternalServerError)
+      return
+    }
+    
+    fmt.Println(webhook)
+    w.WriteHeader(http.StatusOK)
+  })
+
+  if err := http.ListenAndServe("", mux); err != nil {
+    panic(err)
+  }
+}
+
+```
+
 ## Monobank API Documentation
 https://api.monobank.ua/docs/
 
@@ -57,5 +135,5 @@ You can obtain your personal token [here](https://api.monobank.ua).
 
 ## Progress
 - [x] Public API
-- [ ] Personal API (in progress)
-- [ ] Corporate API
+- [x] Personal API
+- [ ] Corporate API (to do)

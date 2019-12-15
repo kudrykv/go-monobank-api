@@ -35,4 +35,12 @@ type Personal interface {
 	Statements(ctx context.Context, account string, from, to time.Time) ([]StatementItem, error)
 	// LatestStatements is the shortcut for `Statements`, where the `to` value is the current moment.
 	LatestStatements(ctx context.Context, account string, from time.Time) ([]StatementItem, error)
+	// SetWebhook sets the webhook.
+	SetWebhook(ctx context.Context, webhook string) error
+	// ParseWebhook is a func that allows to extract the webhook data from the request.
+	ParseWebhook(ctx context.Context, r *http.Request) (*WebhookData, error)
+	// ListenForWebhooks returns channel and handler func.
+	// The client needs to register the handler func.
+	// Client will start receiving webhooks on the channel once they arrive to the handler.
+	ListenForWebhooks(ctx context.Context) (<-chan WebhookData, http.HandlerFunc)
 }

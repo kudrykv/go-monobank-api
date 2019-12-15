@@ -4,6 +4,7 @@ type optioner interface {
 	setDomain(string)
 	setClient(HTTPClient)
 	setUnmarshaller(Unmarshaller)
+	setWebhookBufferSize(uint32)
 }
 
 // Option allows to change default values for client.
@@ -28,5 +29,13 @@ func WithClient(client HTTPClient) Option {
 func WithUnmarshaller(u Unmarshaller) Option {
 	return func(o optioner) {
 		o.setUnmarshaller(u)
+	}
+}
+
+// WithWebhookBufferSize allows to change default buffer size.
+// Default value is 100.
+func WithWebhookBufferSize(size uint32) Option {
+	return func(o optioner) {
+		o.setWebhookBufferSize(size)
 	}
 }

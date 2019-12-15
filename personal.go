@@ -6,7 +6,6 @@ import (
 )
 
 type personal struct {
-	token  string
 	domain string
 
 	tinyClient
@@ -30,7 +29,7 @@ func NewPersonal(apiToken string, opts ...Option) Personal {
 		panic("api token is required")
 	}
 
-	p := personal{token: apiToken}
+	p := personal{tinyClient: tinyClient{token: apiToken}}
 
 	for _, opt := range opts {
 		opt(&p)

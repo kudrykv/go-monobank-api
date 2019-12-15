@@ -54,7 +54,6 @@ func NewPublic(opts ...Option) Public {
 
 func (p public) Currency(ctx context.Context) ([]CurrencyInfo, error) {
 	var currencies []CurrencyInfo
-
 	if err := p.request(ctx, http.MethodGet, p.domain+"/bank/currency", nil, &currencies); err != nil {
 		return nil, err
 	}

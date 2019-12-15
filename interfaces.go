@@ -23,6 +23,7 @@ type Public interface {
 	Currency(ctx context.Context) ([]CurrencyInfo, error)
 }
 
+// Personal is the client for accessing Personal API.
 type Personal interface {
 	ClientInfo(ctx context.Context) (*UserInfo, error)
 }

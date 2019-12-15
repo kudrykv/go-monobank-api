@@ -5,6 +5,11 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/kudrykv/go-monobank-api)](https://goreportcard.com/report/github.com/kudrykv/go-monobank-api)
 [![codecov](https://codecov.io/gh/kudrykv/go-monobank-api/branch/master/graph/badge.svg)](https://codecov.io/gh/kudrykv/go-monobank-api)
 
+---
+
+The library is the client to work with Monobank API.
+One of its features is no dependencies on 3rd-party libraries.
+
 ## Usage
 
 ```go
@@ -49,3 +54,8 @@ func main() {
 https://api.monobank.ua/docs/
 
 You can obtain your personal token [here](https://api.monobank.ua).
+
+## Progress
+- [x] Public API
+- [ ] Personal API (in progress)
+- [ ] Corporate API

@@ -62,6 +62,17 @@ type CurrencyInfo struct {
 	RateCross float64 `json:"rateCross"`
 }
 
+type WebhookData struct {
+	Type string `json:"type"`
+
+	Data WebhookStatementItem `json:"data"`
+}
+
+type WebhookStatementItem struct {
+	AccountID     string        `json:"account"`
+	StatementItem StatementItem `json:"statementItem"`
+}
+
 type errorMono struct {
 	Description string `json:"errorDescription"`
 }

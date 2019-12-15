@@ -37,4 +37,5 @@ type Personal interface {
 	LatestStatements(ctx context.Context, account string, from time.Time) ([]StatementItem, error)
 	// SetWebhook sets the webhook.
 	SetWebhook(ctx context.Context, webhook string) error
+	ParseWebhook(ctx context.Context, r *http.Request) (*WebhookData, error)
 }

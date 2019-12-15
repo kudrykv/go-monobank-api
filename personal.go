@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"fmt"
+	"io/ioutil"
 	"net/http"
 	"strconv"
 	"strings"
@@ -75,4 +77,22 @@ func (p personal) SetWebhook(ctx context.Context, webhook string) error {
 
 	var empty struct{}
 	return p.request(ctx, http.MethodPost, p.domain+"/personal/webhook", body, &empty)
+}
+
+func (p personal) ParseWebhook(_ context.Context, r *http.Request) (*WebhookData, error) {
+	bts, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read body: %v", err)
+	}
+
+	if err := r.Body.Close(); err != nil {
+		return nil, fmt.Errorf("failed to close body: %v", err)
+	}
+
+	var wh WebhookData
+	if err := p.unmarshaller.Unmarshal(bts, &wh); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal bytes: %v", err)
+	}
+
+	return &wh, nil
 }

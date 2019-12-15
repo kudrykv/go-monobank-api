@@ -26,8 +26,13 @@ type Public interface {
 
 // Personal is the client for accessing Personal API.
 type Personal interface {
-	// ClientInfo get info about the client for whom the token belongs.
+	// ClientInfo gets info about the client for whom the token belongs.
 	ClientInfo(ctx context.Context) (*UserInfo, error)
+	// Statements gets transactions for the specified time period.
+	// The duration period can be 2682000 max, which is 31 days + 1 hour.
+	// The bank defines the limitation.
+	// This value is defined in the constant `MaxAllowedDuration`.
 	Statements(ctx context.Context, account string, from, to time.Time) ([]StatementItem, error)
+	// LatestStatements is the shortcut for `Statements`, where the `to` value is the current moment.
 	LatestStatements(ctx context.Context, account string, from time.Time) ([]StatementItem, error)
 }

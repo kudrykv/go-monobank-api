@@ -22,7 +22,7 @@ func (c *core) setUnmarshaller(u Unmarshaller) {
 
 func newCore(opts ...Option) core {
 	c := core{
-		domain: "https://api.monobank.ua",
+		domain: DefaultDomain,
 		tinyClient: tinyClient{
 			client:       &http.Client{},
 			unmarshaller: unmarshaller{},

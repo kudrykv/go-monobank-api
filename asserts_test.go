@@ -28,6 +28,12 @@ func expectNoError(t *testing.T, err error) {
 	}
 }
 
+func expectEquals(t *testing.T, actual, expected interface{}) {
+	if actual != expected {
+		t.Fatalf("Actual != expected. Actual: '%v', expected: '%v'", actual, expected)
+	}
+}
+
 func expectDeepEquals(t *testing.T, actual, expected interface{}) {
 	if !reflect.DeepEqual(actual, expected) {
 		t.Fatal("Actual != expected")

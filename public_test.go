@@ -5,7 +5,6 @@ import (
 	"context"
 	"io/ioutil"
 	"net/http"
-	"reflect"
 	"testing"
 
 	mono "github.com/kudrykv/go-monobank-api"
@@ -45,21 +44,10 @@ func TestNewPublic_Domain(t *testing.T) {
 	public := mono.NewPublic(mono.WithClient(client))
 
 	actual, err := public.Currency(context.Background())
-	if err != nil {
-		t.Fatalf("No error expected, got: %v", err)
-	}
-
-	if !reflect.DeepEqual(actual, expectedCurrencyResponseBody) {
-		t.Error("Actual != expected")
-	}
-
-	if client.Req.URL.Scheme != "https" {
-		t.Error("Actual domain differs from expected. Actual: " + client.Req.URL.Scheme)
-	}
-
-	if client.Req.URL.Host != "api.monobank.ua" {
-		t.Error("Actual domain differs from expected. Actual: " + client.Req.URL.Host)
-	}
+	expectNoError(t, err)
+	expectDeepEquals(t, actual, expectedCurrencyResponseBody)
+	expectEquals(t, client.Req.URL.Scheme, "https")
+	expectEquals(t, client.Req.URL.Host, "api.monobank.ua")
 }
 
 func TestPublic_Currency_Succ(t *testing.T) {
@@ -73,13 +61,8 @@ func TestPublic_Currency_Succ(t *testing.T) {
 
 	public := mono.NewPublic(mono.WithDomain("https://domain"), mono.WithClient(client))
 	actual, err := public.Currency(ctx)
-	if err != nil {
-		t.Fatalf("No error expected, got: %v", err)
-	}
-
-	if !reflect.DeepEqual(actual, expectedCurrencyResponseBody) {
-		t.Error("Actual != expected")
-	}
+	expectNoError(t, err)
+	expectDeepEquals(t, actual, expectedCurrencyResponseBody)
 }
 
 func TestPublic_Currency_FailMono(t *testing.T) {
@@ -93,11 +76,5 @@ func TestPublic_Currency_FailMono(t *testing.T) {
 
 	public := mono.NewPublic(mono.WithDomain("https://domain"), mono.WithClient(client))
 	_, err := public.Currency(ctx)
-	if err == nil {
-		t.Fatal("Error expected, got nil")
-	}
-
-	if err.Error() != "mono error: go away" {
-		t.Error("Actual error differs from expected. Actual> " + err.Error())
-	}
+	expectError(t, err, "mono error: go away")
 }

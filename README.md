@@ -47,3 +47,5 @@ func main() {
 
 ## Monobank API Documentation
 https://api.monobank.ua/docs/
+
+You can obtain your personal token [here](https://api.monobank.ua).

@@ -54,3 +54,8 @@ func main() {
 https://api.monobank.ua/docs/
 
 You can obtain your personal token [here](https://api.monobank.ua).
+
+## Progress
+- [x] Public API
+- [ ] Personal API (in progress)
+- [ ] Corporate API

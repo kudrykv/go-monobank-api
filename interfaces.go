@@ -35,5 +35,6 @@ type Personal interface {
 	Statements(ctx context.Context, account string, from, to time.Time) ([]StatementItem, error)
 	// LatestStatements is the shortcut for `Statements`, where the `to` value is the current moment.
 	LatestStatements(ctx context.Context, account string, from time.Time) ([]StatementItem, error)
+	// SetWebhook sets the webhook.
 	SetWebhook(ctx context.Context, webhook string) error
 }

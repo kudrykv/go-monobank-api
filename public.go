@@ -6,21 +6,7 @@ import (
 )
 
 type public struct {
-	domain string
-
-	tinyClient
-}
-
-func (p *public) setClient(client HTTPClient) {
-	p.client = client
-}
-
-func (p *public) setDomain(domain string) {
-	p.domain = domain
-}
-
-func (p *public) setUnmarshaller(u Unmarshaller) {
-	p.unmarshaller = u
+	core
 }
 
 // NewPublic creates the client to interact with the public API.
@@ -32,24 +18,7 @@ func (p *public) setUnmarshaller(u Unmarshaller) {
 //    mono.WithUnmarshaller(&smthImplementingUnmarshaller),
 //  )
 func NewPublic(opts ...Option) Public {
-	p := public{}
-	for _, opt := range opts {
-		opt(&p)
-	}
-
-	if len(p.domain) == 0 {
-		p.domain = "https://api.monobank.ua"
-	}
-
-	if p.client == nil {
-		p.client = &http.Client{}
-	}
-
-	if p.unmarshaller == nil {
-		p.unmarshaller = unmarshaller{}
-	}
-
-	return p
+	return public{core: newCore(opts...)}
 }
 
 func (p public) Currency(ctx context.Context) ([]CurrencyInfo, error) {

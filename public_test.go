@@ -36,7 +36,7 @@ var expectedCurrencyResponseBody = []mono.CurrencyInfo{{
 }}
 
 func TestNewPublic_Domain(t *testing.T) {
-	client := &currencyClient{}
+	client := &clienttest{}
 	client.Resp = &http.Response{
 		StatusCode: http.StatusOK,
 		Body:       ioutil.NopCloser(bytes.NewReader([]byte(currencyResponseBody))),
@@ -63,7 +63,7 @@ func TestNewPublic_Domain(t *testing.T) {
 }
 
 func TestPublic_Currency_Succ(t *testing.T) {
-	client := &currencyClient{}
+	client := &clienttest{}
 	client.Resp = &http.Response{
 		StatusCode: http.StatusOK,
 		Body:       ioutil.NopCloser(bytes.NewReader([]byte(currencyResponseBody))),
@@ -83,7 +83,7 @@ func TestPublic_Currency_Succ(t *testing.T) {
 }
 
 func TestPublic_Currency_FailMono(t *testing.T) {
-	client := &currencyClient{}
+	client := &clienttest{}
 	client.Resp = &http.Response{
 		StatusCode: http.StatusBadRequest,
 		Body:       ioutil.NopCloser(bytes.NewReader([]byte(failResponseBody))),

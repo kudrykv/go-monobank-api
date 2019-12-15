@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"reflect"
 	"testing"
+	"time"
 
 	mono "github.com/kudrykv/go-monobank-api"
 )
@@ -61,7 +62,7 @@ func TestNewPersonal_PanicOnEmptyToken(t *testing.T) {
 }
 
 func TestPersonal_ClientInfo_Succ(t *testing.T) {
-	client := &currencyClient{}
+	client := &clienttest{}
 	client.Resp = &http.Response{
 		StatusCode: http.StatusOK,
 		Body:       ioutil.NopCloser(bytes.NewReader([]byte(personalResponseBody))),
@@ -82,7 +83,7 @@ func TestPersonal_ClientInfo_Succ(t *testing.T) {
 }
 
 func TestPersonal_ClientInfo_Fail(t *testing.T) {
-	client := &currencyClient{}
+	client := &clienttest{}
 	client.Resp = &http.Response{
 		StatusCode: http.StatusBadRequest,
 		Body:       ioutil.NopCloser(bytes.NewReader([]byte(failResponseBody))),
@@ -99,5 +100,59 @@ func TestPersonal_ClientInfo_Fail(t *testing.T) {
 
 	if err.Error() != "mono error: go away" {
 		t.Error("Actual error differs from expected. Actual> " + err.Error())
+	}
+}
+
+var statementsResponseBody = `[
+  {
+    "id": "ZuHWzqkKGVo=",
+    "time": 1554466347,
+    "description": "Покупка щастя",
+    "mcc": 7997,
+    "hold": false,
+    "amount": -95000,
+    "operationAmount": -95000,
+    "currencyCode": 980,
+    "commissionRate": 0,
+    "cashbackAmount": 19000,
+    "balance": 10050000
+  }
+]`
+
+var expectedStatementsResponse = []mono.StatementItem{{
+	ID:                  "ZuHWzqkKGVo=",
+	Time:                1554466347,
+	Description:         "Покупка щастя",
+	MCC:                 7997,
+	Hold:                false,
+	Amount:              -95000,
+	OperationAmount:     -95000,
+	CurrencyCodeISO4217: 980,
+	CommissionRate:      0,
+	CashbackAmount:      19000,
+	Balance:             10050000,
+}}
+
+func TestPersonal_Statements_Succ(t *testing.T) {
+	client := &clienttest{}
+	client.Resp = &http.Response{
+		StatusCode: http.StatusOK,
+		Body:       ioutil.NopCloser(bytes.NewReader([]byte(statementsResponseBody))),
+	}
+
+	ctx := context.Background()
+	apiToken := "api-token"
+	accountID := "deadbeef"
+	from := time.Now().Add(-time.Hour * 24 * 15) // 15 days
+	to := time.Now()
+
+	personal := mono.NewPersonal(apiToken, mono.WithClient(client))
+	statements, err := personal.Statements(ctx, accountID, from, to)
+	if err != nil {
+		t.Fatal("Expected err to be nil, got: " + err.Error())
+	}
+
+	if !reflect.DeepEqual(statements, expectedStatementsResponse) {
+		t.Fatal("actual != expected")
 	}
 }

@@ -29,4 +29,5 @@ type Personal interface {
 	// ClientInfo get info about the client for whom the token belongs.
 	ClientInfo(ctx context.Context) (*UserInfo, error)
 	Statements(ctx context.Context, account string, from, to time.Time) ([]StatementItem, error)
+	LatestStatements(ctx context.Context, account string, from time.Time) ([]StatementItem, error)
 }

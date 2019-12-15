@@ -35,6 +35,10 @@ func (p personal) ClientInfo(ctx context.Context) (*UserInfo, error) {
 	return &userInfo, nil
 }
 
+func (p personal) LatestStatements(ctx context.Context, account string, from time.Time) ([]StatementItem, error) {
+	return p.Statements(ctx, account, from, time.Now())
+}
+
 func (p personal) Statements(ctx context.Context, account string, from, to time.Time) ([]StatementItem, error) {
 	if len(account) == 0 {
 		return nil, errors.New("account must be set")

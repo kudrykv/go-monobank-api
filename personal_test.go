@@ -195,3 +195,26 @@ func expectError(t *testing.T, actual error, expected string) {
 		t.Error("Actual error is '" + actual.Error() + "', expected '" + expected + "'")
 	}
 }
+
+func TestPersonal_LatestStatements(t *testing.T) {
+	client := &clienttest{}
+	client.Resp = &http.Response{
+		StatusCode: http.StatusOK,
+		Body:       ioutil.NopCloser(bytes.NewReader([]byte(statementsResponseBody))),
+	}
+
+	ctx := context.Background()
+	apiToken := "api-token"
+	accountID := "deadbeef"
+	from := time.Now().Add(-time.Hour * 24 * 15) // 15 days
+
+	personal := mono.NewPersonal(apiToken, mono.WithClient(client))
+	statements, err := personal.LatestStatements(ctx, accountID, from)
+	if err != nil {
+		t.Fatal("Expected err to be nil, got: " + err.Error())
+	}
+
+	if !reflect.DeepEqual(statements, expectedStatementsResponse) {
+		t.Fatal("actual != expected")
+	}
+}

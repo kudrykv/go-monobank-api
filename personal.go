@@ -12,11 +12,6 @@ import (
 	"time"
 )
 
-// MaxAllowedDuration specifies the maximum duration period for getting transactions.
-// The bank defines the value.
-// It equals to 31 days + 1 hour.
-const MaxAllowedDuration = 2682000
-
 type personal struct {
 	core
 }
@@ -98,7 +93,7 @@ func (p personal) ParseWebhook(_ context.Context, r *http.Request) (*WebhookData
 }
 
 func (p personal) ListenForWebhooks(_ context.Context) (<-chan WebhookData, http.HandlerFunc) {
-	whch := make(chan WebhookData, 100)
+	whch := make(chan WebhookData, p.whBufferSize)
 
 	return whch, func(w http.ResponseWriter, r *http.Request) {
 		wh, err := p.ParseWebhook(r.Context(), r)

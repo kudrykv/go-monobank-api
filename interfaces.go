@@ -3,6 +3,7 @@ package mono
 import (
 	"context"
 	"net/http"
+	"time"
 )
 
 // Unmarshaller allows to specify custom struct for unmarshalling response.
@@ -27,4 +28,5 @@ type Public interface {
 type Personal interface {
 	// ClientInfo get info about the client for whom the token belongs.
 	ClientInfo(ctx context.Context) (*UserInfo, error)
+	Statements(ctx context.Context, account string, from, to time.Time) ([]StatementItem, error)
 }

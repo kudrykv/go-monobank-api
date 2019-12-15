@@ -185,3 +185,37 @@ func TestPersonal_LatestStatements(t *testing.T) {
 	expectNoError(t, err)
 	expectDeepEquals(t, statements, expectedStatementsResponse)
 }
+
+func TestPersonal_SetWebhook_Succ(t *testing.T) {
+	client := &clienttest{}
+	client.Resp = &http.Response{
+		StatusCode: http.StatusOK,
+		Body:       ioutil.NopCloser(bytes.NewReader([]byte(`{"status":"ok"}`))),
+	}
+
+	ctx := context.Background()
+	apiToken := "api-token"
+	wh := "https://domain/webhook"
+
+	personal := mono.NewPersonal(apiToken, mono.WithClient(client))
+
+	err := personal.SetWebhook(ctx, wh)
+	expectNoError(t, err)
+}
+
+func TestPersonal_SetWebhook_Fail(t *testing.T) {
+	client := &clienttest{}
+	client.Resp = &http.Response{
+		StatusCode: http.StatusBadRequest,
+		Body:       ioutil.NopCloser(bytes.NewReader([]byte(failResponseBody))),
+	}
+
+	ctx := context.Background()
+	apiToken := "api-token"
+	wh := "https://domain/webhook"
+
+	personal := mono.NewPersonal(apiToken, mono.WithClient(client))
+
+	err := personal.SetWebhook(ctx, wh)
+	expectError(t, err, "mono error: go away")
+}

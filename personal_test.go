@@ -322,3 +322,18 @@ func TestPersonal_ListenForWebhooks_Succ(t *testing.T) {
 		expectDeepEquals(t, wh, webhookParsed)
 	}
 }
+
+func TestPersonal_ListenForWebhooks_Fail(t *testing.T) {
+	client := &clienttest{}
+
+	apiToken := "api-token"
+	personal := mono.NewPersonal(apiToken, mono.WithClient(client))
+
+	_, handlerFunc := personal.ListenForWebhooks(context.Background())
+
+	w := httptest.NewRecorder()
+	r := httptest.NewRequest(http.MethodPost, "/", &badReadCloser{})
+
+	handlerFunc(w, r)
+	expectEquals(t, w.Code, http.StatusInternalServerError)
+}

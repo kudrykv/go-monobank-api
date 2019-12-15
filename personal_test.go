@@ -156,3 +156,42 @@ func TestPersonal_Statements_Succ(t *testing.T) {
 		t.Fatal("actual != expected")
 	}
 }
+
+func TestPersonal_Statements_Fail(t *testing.T) {
+	client := &clienttest{}
+	client.Resp = &http.Response{
+		StatusCode: http.StatusBadRequest,
+		Body:       ioutil.NopCloser(bytes.NewReader([]byte(failResponseBody))),
+	}
+
+	ctx := context.Background()
+	apiToken := "api-token"
+	accountID := "deadbeef"
+	from := time.Now().Add(-time.Hour * 24 * 15) // 15 days
+	to := time.Now()
+
+	personal := mono.NewPersonal(apiToken, mono.WithClient(client))
+
+	_, err := personal.Statements(ctx, "", from, to)
+	expectError(t, err, "account must be set")
+
+	_, err = personal.Statements(ctx, accountID, to, from)
+	expectError(t, err, "`from` should be less than `to`")
+
+	_, err = personal.Statements(ctx, accountID, from.Add(-time.Hour*24*45), to)
+	expectError(t, err, "max allowed duration is 2682000 seconds")
+
+	_, err = personal.Statements(ctx, accountID, from, to)
+	expectError(t, err, "mono error: go away")
+}
+
+func expectError(t *testing.T, actual error, expected string) {
+	if actual == nil {
+		t.Error("Expected error to be present, actual nil")
+		return
+	}
+
+	if actual.Error() != expected {
+		t.Error("Actual error is '" + actual.Error() + "', expected '" + expected + "'")
+	}
+}

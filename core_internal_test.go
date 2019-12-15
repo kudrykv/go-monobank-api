@@ -31,6 +31,14 @@ func TestCore_setUnmarshaller(t *testing.T) {
 	}
 }
 
+func TestCore_setWebhookBufferSize(t *testing.T) {
+	c := newCore(WithWebhookBufferSize(150))
+
+	if c.whBufferSize != 150 {
+		t.Fatal("expected wh buffer size to be custom")
+	}
+}
+
 func TestCoreDefaults(t *testing.T) {
 	c := newCore()
 
@@ -46,5 +54,9 @@ func TestCoreDefaults(t *testing.T) {
 	umsh := unmarshaller{}
 	if c.unmarshaller != umsh {
 		t.Error("expected default unmarshaller, got else")
+	}
+
+	if c.whBufferSize != 100 {
+		t.Error("expected default wh buffer size, got else")
 	}
 }

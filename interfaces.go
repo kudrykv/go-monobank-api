@@ -38,4 +38,5 @@ type Personal interface {
 	// SetWebhook sets the webhook.
 	SetWebhook(ctx context.Context, webhook string) error
 	ParseWebhook(ctx context.Context, r *http.Request) (*WebhookData, error)
+	ListenForWebhooks(ctx context.Context) (<-chan WebhookData, http.HandlerFunc)
 }

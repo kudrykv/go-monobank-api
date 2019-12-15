@@ -96,3 +96,21 @@ func (p personal) ParseWebhook(_ context.Context, r *http.Request) (*WebhookData
 
 	return &wh, nil
 }
+
+func (p personal) ListenForWebhooks(_ context.Context) (<-chan WebhookData, http.HandlerFunc) {
+	whch := make(chan WebhookData, 100)
+
+	return whch, func(w http.ResponseWriter, r *http.Request) {
+		wh, err := p.ParseWebhook(r.Context(), r)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		go func() {
+			whch <- *wh
+		}()
+
+		w.WriteHeader(http.StatusOK)
+	}
+}

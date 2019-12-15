@@ -6,10 +6,10 @@ import (
 )
 
 type personal struct {
-	token        string
-	domain       string
-	client       HTTPClient
-	unmarshaller Unmarshaller
+	token  string
+	domain string
+
+	tinyClient
 }
 
 func (p *personal) setClient(client HTTPClient) {
@@ -53,10 +53,7 @@ func NewPersonal(apiToken string, opts ...Option) Personal {
 func (p personal) ClientInfo(ctx context.Context) (*UserInfo, error) {
 	var userInfo UserInfo
 
-	err := tinyClient{client: p.client, unmarshaller: p.unmarshaller, token: p.token}.
-		request(ctx, http.MethodGet, p.domain+"/personal/client-info", nil, &userInfo)
-
-	if err != nil {
+	if err := p.request(ctx, http.MethodGet, p.domain+"/personal/client-info", nil, &userInfo); err != nil {
 		return nil, err
 	}
 

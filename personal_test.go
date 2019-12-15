@@ -37,6 +37,29 @@ var expectedPersonal = mono.UserInfo{
 	}},
 }
 
+func TestNewPersonal(t *testing.T) {
+	p := mono.NewPersonal("token")
+
+	if p == nil {
+		t.Fatal("personal must not be nil")
+	}
+}
+
+func TestNewPersonal_PanicOnEmptyToken(t *testing.T) {
+	defer func() {
+		err := recover()
+		if err == nil {
+			t.Fatal("expected error, but got nil")
+		}
+
+		if err != "api token is required" {
+			t.Error("got: " + err.(string))
+		}
+	}()
+
+	mono.NewPersonal("")
+}
+
 func TestPersonal_ClientInfo_Succ(t *testing.T) {
 	client := &currencyClient{}
 	client.Resp = &http.Response{

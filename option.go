@@ -10,6 +10,7 @@ type optioner interface {
 type Option func(optioner)
 
 // WithDomain allows to change the default API domain.
+// The domain should be in format `scheme://domain`
 func WithDomain(domain string) Option {
 	return func(o optioner) {
 		o.setDomain(domain)

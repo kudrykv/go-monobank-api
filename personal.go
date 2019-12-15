@@ -6,21 +6,7 @@ import (
 )
 
 type personal struct {
-	domain string
-
-	tinyClient
-}
-
-func (p *personal) setClient(client HTTPClient) {
-	p.client = client
-}
-
-func (p *personal) setDomain(domain string) {
-	p.domain = domain
-}
-
-func (p *personal) setUnmarshaller(u Unmarshaller) {
-	p.unmarshaller = u
+	core
 }
 
 // NewPersonal creates the client to access Personal API.
@@ -29,23 +15,8 @@ func NewPersonal(apiToken string, opts ...Option) Personal {
 		panic("api token is required")
 	}
 
-	p := personal{tinyClient: tinyClient{token: apiToken}}
-
-	for _, opt := range opts {
-		opt(&p)
-	}
-
-	if len(p.domain) == 0 {
-		p.domain = "https://api.monobank.ua"
-	}
-
-	if p.client == nil {
-		p.client = &http.Client{}
-	}
-
-	if p.unmarshaller == nil {
-		p.unmarshaller = unmarshaller{}
-	}
+	p := personal{core: newCore(opts...)}
+	p.token = apiToken
 
 	return p
 }

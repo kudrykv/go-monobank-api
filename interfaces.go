@@ -25,5 +25,6 @@ type Public interface {
 
 // Personal is the client for accessing Personal API.
 type Personal interface {
+	// ClientInfo get info about the client for whom the token belongs.
 	ClientInfo(ctx context.Context) (*UserInfo, error)
 }

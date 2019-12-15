@@ -1,17 +1,5 @@
 package mono
 
-// Cashback is the enum of allowed cashback types.
-type Cashback string
-
-const (
-	// CashbackNone tells there is no cashback.
-	CashbackNone Cashback = "None"
-	// CashbackUAH tells the cashback is in UAH.
-	CashbackUAH Cashback = "UAH"
-	// CashbackMiles tells the cashback is in Miles.
-	CashbackMiles Cashback = "Miles"
-)
-
 // UserInfo describes customer and customer's accounts.
 type UserInfo struct {
 	// Name describes client name.

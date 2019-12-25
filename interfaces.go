@@ -2,6 +2,7 @@ package mono
 
 import (
 	"context"
+	"io"
 	"net/http"
 	"time"
 )
@@ -38,7 +39,7 @@ type Personal interface {
 	// SetWebhook sets the webhook.
 	SetWebhook(ctx context.Context, webhook string) error
 	// ParseWebhook is a func that allows to extract the webhook data from the request.
-	ParseWebhook(ctx context.Context, r *http.Request) (*WebhookData, error)
+	ParseWebhook(ctx context.Context, reader io.ReadCloser) (*WebhookData, error)
 	// ListenForWebhooks returns channel and handler func.
 	// The client needs to register the handler func.
 	// Client will start receiving webhooks on the channel once they arrive to the handler.

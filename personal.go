@@ -5,6 +5,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -74,13 +75,13 @@ func (p personal) SetWebhook(ctx context.Context, webhook string) error {
 	return p.request(ctx, http.MethodPost, p.domain+"/personal/webhook", body, &empty)
 }
 
-func (p personal) ParseWebhook(_ context.Context, r *http.Request) (*WebhookData, error) {
-	bts, err := ioutil.ReadAll(r.Body)
+func (p personal) ParseWebhook(_ context.Context, rc io.ReadCloser) (*WebhookData, error) {
+	bts, err := ioutil.ReadAll(rc)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read body: %v", err)
 	}
 
-	if err := r.Body.Close(); err != nil {
+	if err := rc.Close(); err != nil {
 		return nil, fmt.Errorf("failed to close body: %v", err)
 	}
 
@@ -96,7 +97,7 @@ func (p personal) ListenForWebhooks(_ context.Context) (<-chan WebhookData, http
 	whch := make(chan WebhookData, p.whBufferSize)
 
 	return whch, func(w http.ResponseWriter, r *http.Request) {
-		wh, err := p.ParseWebhook(r.Context(), r)
+		wh, err := p.ParseWebhook(r.Context(), r.Body)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return

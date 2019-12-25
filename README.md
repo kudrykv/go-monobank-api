@@ -107,7 +107,7 @@ func main() {
 
   mux := http.NewServeMux()
   mux.HandleFunc("/webhook", func(w http.ResponseWriter, r *http.Request) {
-    webhook, err := personal.ParseWebhook(r.Context(), r)
+    webhook, err := personal.ParseWebhook(r.Context(), r.Body)
     if err != nil {
       w.WriteHeader(http.StatusInternalServerError)
       return

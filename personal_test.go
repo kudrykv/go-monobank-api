@@ -270,7 +270,7 @@ func TestPersonal_ParseWebhook_Succ(t *testing.T) {
 
 	personal := mono.NewPersonal(apiToken, mono.WithClient(client))
 
-	actual, err := personal.ParseWebhook(ctx, req)
+	actual, err := personal.ParseWebhook(ctx, req.Body)
 	expectNoError(t, err)
 	expectDeepEquals(t, actual, &webhookParsed)
 }
@@ -285,18 +285,18 @@ func TestPersonal_ParseWebhook_Fail(t *testing.T) {
 
 	req := httptest.NewRequest(http.MethodGet, "/", &badReader{})
 
-	_, err := personal.ParseWebhook(ctx, req)
+	_, err := personal.ParseWebhook(ctx, req.Body)
 	expectErrorStartsWith(t, err, "failed to read body: ")
 
 	req = httptest.NewRequest(http.MethodGet, "/", &badReadCloser{})
 
-	_, err = personal.ParseWebhook(ctx, req)
+	_, err = personal.ParseWebhook(ctx, req.Body)
 	expectErrorStartsWith(t, err, "failed to close body: ")
 
 	req = httptest.NewRequest(http.MethodGet, "/", bytes.NewReader([]byte(webhookBody)))
 	um.Err = errors.New("boo")
 
-	_, err = personal.ParseWebhook(ctx, req)
+	_, err = personal.ParseWebhook(ctx, req.Body)
 	expectErrorStartsWith(t, err, "failed to unmarshal bytes: ")
 }
 

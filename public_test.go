@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"testing"
+	"time"
 
 	mono "github.com/kudrykv/go-monobank-api"
 )
@@ -28,7 +29,7 @@ var failResponseBody = `{
 var expectedCurrencyResponseBody = []mono.CurrencyInfo{{
 	CurrencyCodeAISO4217: 840,
 	CurrencyCodeBISO4217: 980,
-	Date:                 1552392228,
+	Date:                 mono.Time(time.Unix(1552392228, 0)),
 	RateSell:             27,
 	RateBuy:              27.2,
 	RateCross:            27.1,

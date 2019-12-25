@@ -1,5 +1,27 @@
 package mono
 
+import (
+	"strconv"
+	"time"
+)
+
+type Time time.Time
+
+func (t *Time) UnmarshalJSON(bts []byte) error {
+	if string(bts) == "null" {
+		return nil
+	}
+
+	num, err := strconv.ParseInt(string(bts), 10, 64)
+	if err != nil {
+		return err
+	}
+
+	*t = Time(time.Unix(num, 0))
+
+	return nil
+}
+
 // UserInfo describes customer and customer's accounts.
 type UserInfo struct {
 	// Name describes client name.
@@ -31,7 +53,7 @@ type StatementItem struct {
 	// Transaction identifier.
 	ID string `json:"id"`
 	// Time when the transaction was made in UNIX timestamp.
-	Time        int64  `json:"time"`
+	Time        Time   `json:"time"`
 	Description string `json:"description"`
 	// Merchant Category Code
 	MCC int `json:"mcc"`
@@ -56,7 +78,7 @@ type CurrencyInfo struct {
 	CurrencyCodeAISO4217 int `json:"currencyCodeA"`
 	CurrencyCodeBISO4217 int `json:"currencyCodeB"`
 	// Rate at the given point of time in UNIX timestamp.
-	Date      int64   `json:"date"`
+	Date      Time    `json:"date"`
 	RateSell  float64 `json:"rateSell"`
 	RateBuy   float64 `json:"rateBuy"`
 	RateCross float64 `json:"rateCross"`

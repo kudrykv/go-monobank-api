@@ -1,5 +1,17 @@
 package mono
 
+import (
+	"time"
+)
+
+// Time wraps int64 to add a func for converting the value to time.Time.
+type Time int64
+
+// Time creates the time.Time from the int64 value.
+func (t Time) Time() time.Time {
+	return time.Unix(int64(t), 0)
+}
+
 // UserInfo describes customer and customer's accounts.
 type UserInfo struct {
 	// Name describes client name.
@@ -31,7 +43,7 @@ type StatementItem struct {
 	// Transaction identifier.
 	ID string `json:"id"`
 	// Time when the transaction was made in UNIX timestamp.
-	Time        int64  `json:"time"`
+	Time        Time   `json:"time"`
 	Description string `json:"description"`
 	// Merchant Category Code
 	MCC int `json:"mcc"`
@@ -56,7 +68,7 @@ type CurrencyInfo struct {
 	CurrencyCodeAISO4217 int `json:"currencyCodeA"`
 	CurrencyCodeBISO4217 int `json:"currencyCodeB"`
 	// Rate at the given point of time in UNIX timestamp.
-	Date      int64   `json:"date"`
+	Date      Time    `json:"date"`
 	RateSell  float64 `json:"rateSell"`
 	RateBuy   float64 `json:"rateBuy"`
 	RateCross float64 `json:"rateCross"`

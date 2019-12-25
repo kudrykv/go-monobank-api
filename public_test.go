@@ -28,7 +28,7 @@ var failResponseBody = `{
 var expectedCurrencyResponseBody = []mono.CurrencyInfo{{
 	CurrencyCodeAISO4217: 840,
 	CurrencyCodeBISO4217: 980,
-	Date:                 1552392228,
+	Date:                 mono.Time(1552392228),
 	RateSell:             27,
 	RateBuy:              27.2,
 	RateCross:            27.1,

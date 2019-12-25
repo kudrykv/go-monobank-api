@@ -108,7 +108,7 @@ var statementsResponseBody = `[
 
 var expectedStatementsResponse = []mono.StatementItem{{
 	ID:                  "ZuHWzqkKGVo=",
-	Time:                1554466347,
+	Time:                mono.Time(1554466347),
 	Description:         "Покупка щастя",
 	MCC:                 7997,
 	Hold:                false,
@@ -247,7 +247,7 @@ var webhookParsed = mono.WebhookData{
 		AccountID: "deadbeef",
 		StatementItem: mono.StatementItem{
 			ID:                  "ZuHWzqkKGVo=",
-			Time:                1554466347,
+			Time:                mono.Time(1554466347),
 			Description:         "Покупка щастя",
 			MCC:                 7997,
 			Hold:                false,

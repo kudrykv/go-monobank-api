@@ -1,7 +1,6 @@
 package mono
 
 import (
-	"strconv"
 	"time"
 )
 
@@ -9,21 +8,6 @@ type Time int64
 
 func (t Time) Time() time.Time {
 	return time.Unix(int64(t), 0)
-}
-
-func (t *Time) UnmarshalJSON(bts []byte) error {
-	if string(bts) == "null" {
-		return nil
-	}
-
-	num, err := strconv.ParseInt(string(bts), 10, 64)
-	if err != nil {
-		return err
-	}
-
-	*t = Time(num)
-
-	return nil
 }
 
 // UserInfo describes customer and customer's accounts.

@@ -4,8 +4,10 @@ import (
 	"time"
 )
 
+// Time wraps int64 to add a func for converting the value to time.Time.
 type Time int64
 
+// Time creates the time.Time from the int64 value.
 func (t Time) Time() time.Time {
 	return time.Unix(int64(t), 0)
 }

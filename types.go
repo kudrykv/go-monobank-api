@@ -2,9 +2,14 @@ package mono
 
 import (
 	"strconv"
+	"time"
 )
 
 type Time int64
+
+func (t Time) Time() time.Time {
+	return time.Unix(int64(t), 0)
+}
 
 func (t *Time) UnmarshalJSON(bts []byte) error {
 	if string(bts) == "null" {
